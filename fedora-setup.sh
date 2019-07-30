@@ -7,7 +7,7 @@ set -e
 sudo dnf -y update
 
 # Install all commonly used packages
-sudo dnf -y install wget curl bash htop vim gvim nano git gcc make ShellCheck python3.7 python3-devel python3-virtualenv ncurses ncurses-devel firefox gnome-tweaks postgresql-server postgresql-contrib
+sudo dnf -y install wget curl bash htop vim gvim nano git gcc make ShellCheck python3.7 python3-devel python3-virtualenv ncurses ncurses-devel firefox gnome-tweaks postgresql-server postgresql-contrib libxcrypt-compat
 
 # Enable PostgreSQL server daemon
 sudo systemctl enable postgresql
