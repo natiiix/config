@@ -22,7 +22,7 @@ sudo ln -sf /usr/bin/python3 /usr/bin/python
 sudo ln -sf /usr/bin/pip3 /usr/bin/pip
 
 # Update pip3 and install some commonly used Python packages
-sudo pip3 install --upgrade pip pylint autopep8 postgres
+sudo pip3 install --upgrade pip pylint autopep8 flask postgres
 
 # Set hostname
 sudo sh -c 'echo "imeixner-fedora" > /etc/hostname'
