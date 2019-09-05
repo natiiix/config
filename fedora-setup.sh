@@ -27,11 +27,16 @@ sudo pip3 install --upgrade pip pylint autopep8 flask easy-postgres
 # Set hostname
 sudo sh -c 'echo "imeixner-fedora" > /etc/hostname'
 
+# Set GOPATH
+mkdir -p ~/go
+echo 'export GOPATH=~/go' >> ~/.bashrc
+source ~/.bashrc
+
 # Download Vim configuration file
 wget https://raw.githubusercontent.com/natiiix/config/master/.vimrc -O ~/.vimrc
 
 # Generate an SSH key (this can be used for GitHub, GitLab, etc.)
-[ -f ~/.ssh/id_rsa ] || ssh-keygen -t rsa -b 4096 -f $HOME/.ssh/id_rsa -N "" -C "natiwastaken@gmail.com"
+[ -f ~/.ssh/id_rsa ] || ssh-keygen -t rsa -b 4096 -f ~/.ssh/id_rsa -N "" -C "natiwastaken@gmail.com"
 
 # Configure Git
 git config --global user.name "Ivo Meixner"
@@ -56,4 +61,6 @@ code --install-extension njpwerner.autodocstring
 code --install-extension VisualStudioExptTeam.vscodeintellicode
 code --install-extension vscode-icons-team.vscode-icons
 code --install-extension zhuangtongfa.Material-theme
+
+echo '---- Jobs done! :-) ----'
 
