@@ -7,7 +7,7 @@ set -e
 sudo dnf -y update
 
 # Install all commonly used packages
-sudo dnf -y install wget curl bash htop vim gvim nano git gcc make ShellCheck python3.7 python3-devel python3-virtualenv ncurses ncurses-devel firefox gnome-tweaks postgresql-server postgresql-contrib libxcrypt-compat
+sudo dnf -y install wget curl bash htop vim gvim nano git gcc make ShellCheck python3.7 python3-devel python3-virtualenv ncurses ncurses-devel firefox gnome-tweaks postgresql-server postgresql-contrib libxcrypt-compat golang
 
 # Enable PostgreSQL server daemon
 sudo systemctl enable postgresql
@@ -22,7 +22,7 @@ sudo ln -sf /usr/bin/python3 /usr/bin/python
 sudo ln -sf /usr/bin/pip3 /usr/bin/pip
 
 # Update pip3 and install some commonly used Python packages
-sudo pip3 install --upgrade pip pylint autopep8 flask postgres
+sudo pip3 install --upgrade pip pylint autopep8 flask easy-postgres
 
 # Set hostname
 sudo sh -c 'echo "imeixner-fedora" > /etc/hostname'
