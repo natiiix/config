@@ -105,7 +105,7 @@ cmp "$fixture/.config/kitty/kitty.conf" "$XDG_CONFIG_HOME/kitty/kitty.conf"
 cmp "$fixture/.config/dunst/dunstrc" "$XDG_CONFIG_HOME/dunst/dunstrc"
 {
     cat "$fixture/.config/i3/config"
-    printf '%s\n' "$marker"
+    printf '\n%s\n\n' "$marker"
     printf 'exec local-startup\nbindsym Mod4+x exec local'
 } > "$test_dir/expected-i3"
 cmp "$test_dir/expected-i3" "$XDG_CONFIG_HOME/i3/config"
@@ -121,7 +121,7 @@ cmp "$test_dir/status-before" "$XDG_CONFIG_HOME/i3status/config"
 # A missing exact marker is added during whole-file replacement.
 {
     cat "$fixture/.config/i3/config"
-    printf '%s\n' "$marker"
+    printf '\n%s\n\n' "$marker"
 } > "$test_dir/expected-i3"
 for content in $'unmarked config\n' $'# -------------------------------------------------------------\nold settings\n' "$marker"$' \nold settings\n'; do
     reset_host
@@ -170,6 +170,8 @@ cmp "$test_dir/expected-i3" "$HOME/.config/i3/config"
 cmp "$fixture/.config/i3status/config" "$HOME/.config/i3status/config"
 cmp "$fixture/.config/kitty/kitty.conf" "$HOME/.config/kitty/kitty.conf"
 cmp "$fixture/.config/dunst/dunstrc" "$HOME/.config/dunst/dunstrc"
+run_sync '' '--from-host'
+[[ $(grep -c 'Already up to date:' "$test_dir/output") == 5 ]]
 
 # Existing symlinks keep pointing at the updated file.
 mv "$HOME/.vimrc" "$HOME/vim-target"
@@ -240,6 +242,9 @@ for dependency in 'kitty' 'i3' 'i3status' 'setxkbmap' 'pactl' 'killall' 'dunst' 
     mv "$test_dir/bin/$dependency.unavailable" "$test_dir/bin/$dependency"
 done
 # Exporting and importing again must not accumulate blank lines.
+run_sync $'y\n'
+run_sync '' '--from-host'
+[[ $(grep -c 'Already up to date:' "$test_dir/output") == 5 ]]
 run_sync ''
 [[ $(grep -c 'Already up to date:' "$test_dir/output") == 5 ]]
 
@@ -250,18 +255,21 @@ cmp "$XDG_CONFIG_HOME/i3/config" "$fixture/.config/i3/config"
 
 # Forward sync keeps the marker separate when shared content lacks a newline.
 run_sync $'y\n'
-printf 'shared without marker\n%s\n' "$marker" > "$test_dir/expected-i3"
+printf 'shared without marker\n\n%s\n\n' "$marker" > "$test_dir/expected-i3"
 cmp "$test_dir/expected-i3" "$XDG_CONFIG_HOME/i3/config"
 
 printf 'outdated\n%s\nlocal' "$marker" > "$XDG_CONFIG_HOME/i3/config"
 run_sync $'y\n'
-printf 'shared without marker\n%s\nlocal' "$marker" > "$test_dir/expected-i3"
+printf 'shared without marker\n\n%s\n\nlocal' "$marker" > "$test_dir/expected-i3"
 cmp "$test_dir/expected-i3" "$XDG_CONFIG_HOME/i3/config"
 
 # A marker at the first line imports an empty shared config.
 printf '%s\nlocal only\n' "$marker" > "$XDG_CONFIG_HOME/i3/config"
 run_sync $'y\n' '--from-host'
 [[ ! -s "$fixture/.config/i3/config" ]]
+run_sync $'y\n'
+printf '\n%s\n\nlocal only\n' "$marker" > "$test_dir/expected-i3"
+cmp "$test_dir/expected-i3" "$XDG_CONFIG_HOME/i3/config"
 run_sync ''
 [[ $(grep -c 'Already up to date:' "$test_dir/output") == 5 ]]
 

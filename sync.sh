@@ -48,6 +48,7 @@ marker_line() {
 
 sync_file() {
     local source="$1" destination="$2" target before candidate line answer diff_status existed=0
+    local -a first_override=()
     if ((from_host)); then
         source="$2"
         destination="$1"
@@ -75,6 +76,10 @@ sync_file() {
         line="$(marker_line "$candidate")"
         if ((from_host)); then
             if ((line)); then
+                # The blank line before the marker belongs to the delimiter.
+                if ((line > 1)) && [[ -z "$(head -n "$((line - 1))" -- "$candidate" | tail -n 1)" ]]; then
+                    line=$((line - 1))
+                fi
                 head -n "$((line - 1))" -- "$candidate" > "$work_dir/shared"
                 mv -- "$work_dir/shared" "$candidate"
             fi
@@ -88,10 +93,15 @@ sync_file() {
             if [[ -s "$candidate" && -n "$(tail -c 1 -- "$candidate")" ]]; then
                 printf '\n' >> "$candidate"
             fi
+            printf '\n%s\n' "$marker" >> "$candidate"
             if ((line)); then
-                tail -n "+$line" -- "$before" >> "$candidate"
-            else
-                printf '%s\n' "$marker" >> "$candidate"
+                mapfile -t -n 1 -s "$line" first_override < "$before"
+            fi
+            if [[ ! -v 'first_override[0]' || -n "${first_override[0]}" ]]; then
+                printf '\n' >> "$candidate"
+            fi
+            if ((line)); then
+                tail -n "+$((line + 1))" -- "$before" >> "$candidate"
             fi
             if ! i3 -C -c "$candidate"; then
                 printf 'Merged i3 config is invalid. Remove duplicate shared bindings from local overrides, or fix the reported errors, then rerun.\n' >&2

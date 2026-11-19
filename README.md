@@ -41,13 +41,12 @@ Put host-specific i3 settings below this line in the host's config.
 # === local overrides ===
 ```
 
-For repo → host, the shared config replaces everything before the marker;
-the host's marker and everything below it are preserved byte-for-byte. If the
-host config or marker is missing, `sync.sh` installs the shared config followed
-by the marker. A final newline is added to the shared section if needed to
-keep the marker separate.
-For host → repo, the marker and everything below it are excluded. The repo's
-source config must contain only shared settings, without a marker or overrides.
+For repo → host, `sync.sh` writes the shared config followed by the marker
+and any existing host overrides. It adds an empty line on each side of the
+marker and reuses an existing empty line immediately after it.
+For host → repo, the marker, the empty line immediately before it, and
+everything below it are excluded. The repo's source config must contain only
+shared settings.
 Without a host marker, host → repo copies the entire i3 file.
 Duplicate host markers are rejected. Repo → host also rejects a marker in the
 repo config and validates the merged i3 config with `i3 -C` before prompting.
