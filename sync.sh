@@ -84,12 +84,14 @@ sync_file() {
                 exit 1
             fi
             line="$(marker_line "$before")"
+            # Add a newline only when needed to keep the marker on its own line.
+            if [[ -s "$candidate" && -n "$(tail -c 1 -- "$candidate")" ]]; then
+                printf '\n' >> "$candidate"
+            fi
             if ((line)); then
-                # Add a newline only when needed to keep the marker on its own line.
-                if [[ -s "$candidate" && -n "$(tail -c 1 -- "$candidate")" ]]; then
-                    printf '\n' >> "$candidate"
-                fi
                 tail -n "+$line" -- "$before" >> "$candidate"
+            else
+                printf '%s\n' "$marker" >> "$candidate"
             fi
             if ! i3 -C -c "$candidate"; then
                 printf 'Merged i3 config is invalid. Remove duplicate shared bindings from local overrides, or fix the reported errors, then rerun.\n' >&2

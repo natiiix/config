@@ -118,7 +118,11 @@ cmp "$fixture/.vimrc" "$HOME/.vimrc"
 cmp "$test_dir/i3-before" "$XDG_CONFIG_HOME/i3/config"
 cmp "$test_dir/status-before" "$XDG_CONFIG_HOME/i3status/config"
 
-# No exact marker means a whole-file diff, even with similar comments.
+# A missing exact marker is added during whole-file replacement.
+{
+    cat "$fixture/.config/i3/config"
+    printf '%s\n' "$marker"
+} > "$test_dir/expected-i3"
 for content in $'unmarked config\n' $'# -------------------------------------------------------------\nold settings\n' "$marker"$' \nold settings\n'; do
     reset_host
     printf '%s' "$content" > "$XDG_CONFIG_HOME/i3/config"
@@ -126,7 +130,7 @@ for content in $'unmarked config\n' $'# ----------------------------------------
     run_sync $'n\nn\nn\n'
     assert_unchanged
     run_sync $'n\ny\nn\n'
-    cmp "$fixture/.config/i3/config" "$XDG_CONFIG_HOME/i3/config"
+    cmp "$test_dir/expected-i3" "$XDG_CONFIG_HOME/i3/config"
     cmp "$test_dir/vim-before" "$HOME/.vimrc"
     cmp "$test_dir/status-before" "$XDG_CONFIG_HOME/i3status/config"
 done
@@ -162,7 +166,7 @@ run_sync $'n\nn\nn\nn\nn\n'
 [[ ! -e "$HOME" ]]
 run_sync $'y\ny\ny\ny\ny\n'
 cmp "$fixture/.vimrc" "$HOME/.vimrc"
-cmp "$fixture/.config/i3/config" "$HOME/.config/i3/config"
+cmp "$test_dir/expected-i3" "$HOME/.config/i3/config"
 cmp "$fixture/.config/i3status/config" "$HOME/.config/i3status/config"
 cmp "$fixture/.config/kitty/kitty.conf" "$HOME/.config/kitty/kitty.conf"
 cmp "$fixture/.config/dunst/dunstrc" "$HOME/.config/dunst/dunstrc"
@@ -245,6 +249,10 @@ run_sync $'y\n' '--from-host'
 cmp "$XDG_CONFIG_HOME/i3/config" "$fixture/.config/i3/config"
 
 # Forward sync keeps the marker separate when shared content lacks a newline.
+run_sync $'y\n'
+printf 'shared without marker\n%s\n' "$marker" > "$test_dir/expected-i3"
+cmp "$test_dir/expected-i3" "$XDG_CONFIG_HOME/i3/config"
+
 printf 'outdated\n%s\nlocal' "$marker" > "$XDG_CONFIG_HOME/i3/config"
 run_sync $'y\n'
 printf 'shared without marker\n%s\nlocal' "$marker" > "$test_dir/expected-i3"

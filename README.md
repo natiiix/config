@@ -35,18 +35,20 @@ permissions are preserved, replacements are atomic, and edits made to a target
 while its diff is open cause the script to stop rather than overwrite them.
 Missing or non-regular source files cause an error.
 
-Put this exact line before host-specific settings in the host's i3 config:
+Put host-specific i3 settings below this line in the host's config.
 
 ```text
 # === local overrides ===
 ```
 
 For repo → host, the shared config replaces everything before the marker;
-the host's marker and everything below it are preserved byte-for-byte. A final
-newline is added to the shared section if needed to keep the marker separate.
+the host's marker and everything below it are preserved byte-for-byte. If the
+host config or marker is missing, `sync.sh` installs the shared config followed
+by the marker. A final newline is added to the shared section if needed to
+keep the marker separate.
 For host → repo, the marker and everything below it are excluded. The repo's
 source config must contain only shared settings, without a marker or overrides.
-Without a host marker, the entire i3 file is synced in either direction.
+Without a host marker, host → repo copies the entire i3 file.
 Duplicate host markers are rejected. Repo → host also rejects a marker in the
 repo config and validates the merged i3 config with `i3 -C` before prompting.
 
